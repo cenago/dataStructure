@@ -1,8 +1,7 @@
 import sys
 master = {}
-
-# for i in ['mage', 'ela', 'kishore', 'murali']:
-#     master[i] = []
+#
+master = {'mage': {}, 'ela': {'pay_mage':405}, 'kishore': {}, 'murali': {'pay_mage':405}}
 class expence(object):
 
     def __init__(self):
@@ -14,7 +13,8 @@ class expence(object):
             if i.name not in master.keys():
                 master.update({i.name:{}})
             else:
-                master[i.name].update({'solo': i.solo})
+                # master[i.name].update({'solo': i.solo})
+                pass
         spent_ll = [i.name for i in spent_by]
         sumn = 0
         max_amt = spent_by[0]
@@ -24,8 +24,8 @@ class expence(object):
             if max_amt.spent < user.spent:
                 max_amt = user
             sumn += user.spent
-        print(exp_type + " - total spent by "+ ", ".join([i.name for i in spent_by]) +" = " + str(sumn))
-        print("individual expence : " + str(sumn/len(shared_list)))
+        # print(exp_type + " - total spent by "+ ", ".join([i.name for i in spent_by]) +" = " + str(sumn))
+        # print("individual expence : " + str(sumn/len(shared_list)))
         total = sumn
         indi = sumn/len(shared_list)
         # print(max_amt.name)
@@ -58,11 +58,11 @@ class expence(object):
 
                 if (update_tt - i.spent) > 0:
                     update_tt = update_tt - indi
-                    print(indi - i.spent , i.name, ' pay to ',max_amt.name)
+                    # print(indi - i.spent , i.name, ' pay to ',max_amt.name)
                     amt = indi - i.spent
 
                     try:
-                        print(master)
+                        # print(master)
 
                         try:
                             tmp_amt = master[i.name]['pay_' + max_amt.name]
@@ -70,9 +70,7 @@ class expence(object):
                             tmp_amt = 0
                         master[i.name]['pay_' + max_amt.name] = tmp_amt + amt
                     except KeyError:
-                        print("error sfd")
-                        tmp = {'pay_' + max_amt.name: amt}
-                        master[i.name].update(tmp)
+
                         sys.exit()
 
                     try:
@@ -83,14 +81,10 @@ class expence(object):
                         indi1 = tmp_indi + indi
                         master[i.name]['ind'] = indi1
                     except KeyError:
-                        print("error sds")
-                        tmp = {'ind': indi}
-                        master[i.name].update(tmp)
+
                         sys.exit()
                 else:
-                    print("Error")
                     sys.exit()
-        print(update_tt, "update_tt")
 
         for i in shared_list:
             if i.name not in spent_ll:
@@ -105,25 +99,17 @@ class expence(object):
 
                 except KeyError:
                     print("error")
-                    tmp = {i.name:{'ind': indi}}
-                    master.update(tmp)
                     sys.exit()
 
                 try:
-                    tmp_indi = master[i.name]['ind']
-                    # indi1 = tmp_indi + indi
                     try:
-                        print(i.name)
                         tmp_amt = master[i.name]['pay_' + max_amt.name]
                     except KeyError:
                         tmp_amt = 0
                     master[i.name]['pay_' + max_amt.name] = tmp_amt + indi
                 except KeyError:
                     print("error")
-                    tmp = {'pay_' + max_amt.name: indi}
-                    master[i.name].update(tmp)
                     sys.exit()
-
 
         return total
 
@@ -141,9 +127,9 @@ ela = user_node('ela', 200)
 kishore = user_node('kishore', 0)
 murali = user_node('murali', 40)
 
-indi = teator_snaks.add_expence("Teator Snaks", [mage, ela, kishore, murali], [kishore,murali])
-print(master)
-
+indi = teator_snaks.add_expence("Teator Snaks", [mage, ela, kishore, murali], [ela,murali])
+# print(master)
+master['teator_snaks'] = master
 
 teator_parking = expence()
 mage1 = user_node('mage', 0)
@@ -159,7 +145,6 @@ kishore1 = user_node('kishore', 0)
 murali1 = user_node('murali', 80)
 
 indi1 = teator_parking.add_expence("Parking", [mage1, ela1, kishore1, murali1], [murali1])
-print(master)
 
 teator_cdrinks = expence()
 mage2 = user_node('mage', 310)
@@ -175,6 +160,37 @@ murali2 = user_node('murali', 0, 405)
 indi2 = teator_parking.add_expence("Parking", [mage2, ela2, murali2], [mage2])
 
 
+for i in ['mage', 'ela', 'kishore', 'murali']:
+    # print(i, master[i])
+    for j in master[i].keys():
+        if 'pay_' in j:
+            # print(j, j.split("_")[-1])
+            var = master[j.split("_")[-1]]
+            # print(var)
+            if 'pay_' + i in var.keys():
+                # print(var['pay_' + i], 'pay_' + i)
+                s = master[i][j]
+                t = var['pay_' + i]
+                # print(s, t)
+                diff = abs(s - t)
+                if s > t:
+                    # print('set s', diff)
+                    master[i][j] = diff
+                    # del(master[j.split("_")[-1]]['pay_' + i])
+                    master[j.split("_")[-1]]['pay_' + i] = 0
+                else:
+                    # print(j,'set t', diff)
+                    master[j.split("_")[-1]]['pay_' + i] = diff
+                    # del (master[i][j])
+                    master[i][j] = 0
 
 for i, j in master.items():
-    print(i, j, j['solo'])
+    try:
+        del (master[i]['ind'])
+    except KeyError:
+        pass
+    dd = {x:y for x, y in j.items() if y!=0}
+    master[i] = dd
+    print(i, dd)
+
+
